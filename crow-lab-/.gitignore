@@ -1,0 +1,16 @@
+# Сборка
+build/
+cmake-build-*/
+*.o
+*.exe
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Временные файлы
+*.log
+*.tmp
