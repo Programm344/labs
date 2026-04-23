@@ -12,6 +12,7 @@
 #include "../dto/client_info_dto.h"
 #include "../dto/database_info_dto.h"
 #include "../config/app_config.h"
+#include "../interfaces/i_database_info.h"
 
 namespace controllers{
 
@@ -19,11 +20,12 @@ class InfoController{
 private:
 std::shared_ptr<interfaces::ISystemInfo> ISystemInfo_;
 std::shared_ptr<interfaces::IClientData> IClientData_;
+std::shared_ptr<interfaces::IDatabaseInfo> IDatabaseInfo_; 
 
 public:
 
-InfoController(std::shared_ptr<interfaces::ISystemInfo> SystemInfo, std::shared_ptr<interfaces::IClientData> ClientData) 
-: ISystemInfo_(SystemInfo), IClientData_(ClientData) { }
+InfoController(std::shared_ptr<interfaces::ISystemInfo> SystemInfo, std::shared_ptr<interfaces::IClientData> ClientData, std::shared_ptr<interfaces::IDatabaseInfo> DatabaseInfo) 
+: ISystemInfo_(SystemInfo), IClientData_(ClientData),  IDatabaseInfo_(DatabaseInfo)  { }
 
 crow::response serverInfo(const crow::request& req){
     dto::ServerInfoDto dto(
@@ -57,17 +59,16 @@ crow::response serverInfo(const crow::request& req){
 
       crow::response databaseInfo(const crow::request& req) {
         
-        dto::DatabaseInfoDto dto(
-            "SQLite",
-            "3.40.0",
-            "in-memory",
-            "Connected"
-        );
+       dto::DatabaseInfoDto dto(
+        IDatabaseInfo_->getDriver(),
+        IDatabaseInfo_->getVersion(),
+        IDatabaseInfo_->getDatabaseName(),
+        IDatabaseInfo_->getStatus()
+    );
 
-        crow::response res(dto.toJson());
-        res.add_header("Content-Type", "application/json");
-        return res;
-
+    crow::response res(dto.toJson());
+    res.add_header("Content-Type", "application/json");
+    return res;
 }
 };
 }
