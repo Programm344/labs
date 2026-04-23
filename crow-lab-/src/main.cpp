@@ -5,15 +5,17 @@
 #include "services/linux_system_info.h"
 #include "services/http_client_data.h"
 #include "config/app_config.h"
+#include "services/sqlite_database_info.h"
 
 int main(){
     crow::SimpleApp app;
 
     auto systemInfo = std::make_shared<services::LinuxSystemInfo>();
     auto clientData = std::make_shared<services::HttpClientData>();
+    auto databaseInfo = std::make_shared<services::SqliteDatabaseInfo>();
 
     auto controller = std::make_shared<controllers::InfoController>(
-        systemInfo, clientData
+        systemInfo, clientData, databaseInfo
     );
 
     std::cout << "Первая лаба по серверным приложениям" << std::endl;
