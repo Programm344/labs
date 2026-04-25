@@ -1,5 +1,4 @@
-#include "Database.h"
-
+#include "database.h"
 
 Database* Database::instance = nullptr;
 

@@ -10,39 +10,39 @@ using json = nlohmann::json;
 
 class RegisterRequest {
 private:
-    std::string username;
-    std::string email;
-    std::string password;
-    std::string c_password;
-    std::string birthday;
-    std::vector<std::string> errors;
+    std::string username_;
+    std::string email_;
+    std::string password_;
+    std::string c_password_;
+    std::string birthday_;
+    std::vector<std::string> errors_;
     
-    bool validateUsername() {
+    bool validate_username() {
         std::regex pattern("^[A-Z][a-zA-Z]{6,}$");
-        return std::regex_match(username, pattern);
+        return std::regex_match(username_, pattern);
     }
     
-    bool validateEmail() {
+    bool validate_email() {
         std::regex pattern(R"(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)");
-        return std::regex_match(email, pattern);
+        return std::regex_match(email_, pattern);
     }
     
-    bool validatePassword() {
-        if (password.length() < 8) return false;
+    bool validate_password() {
+        if (password_.length() < 8) return false;
         
-        bool hasDigit = false, hasSpecial = false, hasUpper = false, hasLower = false;
-        for (char c : password) {
-            if (isdigit(c)) hasDigit = true;
-            else if (isupper(c)) hasUpper = true;
-            else if (islower(c)) hasLower = true;
-            else if (!isalnum(c)) hasSpecial = true;
+        bool has_digit = false, has_special = false, has_upper = false, has_lower = false;
+        for (char c : password_) {
+            if (isdigit(c)) has_digit = true;
+            else if (isupper(c)) has_upper = true;
+            else if (islower(c)) has_lower = true;
+            else if (!isalnum(c)) has_special = true;
         }
-        return hasDigit && hasSpecial && hasUpper && hasLower;
+        return has_digit && has_special && has_upper && has_lower;
     }
     
-    bool validateAge() {
+    bool validate_age() {
         int year, month, day;
-        if (sscanf(birthday.c_str(), "%d-%d-%d", &year, &month, &day) != 3) {
+        if (sscanf(birthday_.c_str(), "%d-%d-%d", &year, &month, &day) != 3) {
             return false;
         }
         
@@ -60,24 +60,24 @@ private:
     
 public:
     RegisterRequest(const json& data) {
-        if (data.contains("username")) username = data["username"];
-        if (data.contains("email")) email = data["email"];
-        if (data.contains("password")) password = data["password"];
-        if (data.contains("c_password")) c_password = data["c_password"];
-        if (data.contains("birthday")) birthday = data["birthday"];
+        if (data.contains("username")) username_ = data["username"];
+        if (data.contains("email")) email_ = data["email"];
+        if (data.contains("password")) password_ = data["password"];
+        if (data.contains("c_password")) c_password_ = data["c_password"];
+        if (data.contains("birthday")) birthday_ = data["birthday"];
     }
     
     bool validate() {
-        errors.clear();
-        if (!validateUsername()) errors.push_back("Invalid username format");
-        if (!validateEmail()) errors.push_back("Invalid email format");
-        if (!validatePassword()) errors.push_back("Password too weak");
-        if (password != c_password) errors.push_back("Passwords do not match");
-        if (!validateAge()) errors.push_back("You must be at least 14 years old");
-        return errors.empty();
+        errors_.clear();
+        if (!validate_username()) errors_.push_back("Invalid username format");
+        if (!validate_email()) errors_.push_back("Invalid email format");
+        if (!validate_password()) errors_.push_back("Password too weak");
+        if (password_ != c_password_) errors_.push_back("Passwords do not match");
+        if (!validate_age()) errors_.push_back("You must be at least 14 years old");
+        return errors_.empty();
     }
     
-    const std::vector<std::string>& getErrors() const { return errors; }
+    const std::vector<std::string>& get_errors() const { return errors_; }
 
     struct RegisterData {
         std::string username;
@@ -86,10 +86,10 @@ public:
         std::string birthday;
     };
     
-    RegisterData toDTO() const { return {username, email, password, birthday}; }
+    RegisterData to_dto() const { return {username_, email_, password_, birthday_}; }
     
-    std::string getUsername() const { return username; }
-    std::string getEmail() const { return email; }
-    std::string getPassword() const { return password; }
-    std::string getBirthday() const { return birthday; }
+    std::string get_username() const { return username_; }
+    std::string get_email() const { return email_; }
+    std::string get_password() const { return password_; }
+    std::string get_birthday() const { return birthday_; }
 };

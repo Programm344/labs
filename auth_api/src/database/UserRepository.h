@@ -18,9 +18,9 @@ public:
                        const std::string& password_hash,
                        const std::string& birthday);
     
-    static std::optional<UserRecord> findByUsername(const std::string& username);
-    static std::optional<UserRecord> findById(int id);
-    static bool isUsernameUnique(const std::string& username);
-    static bool isEmailUnique(const std::string& email);
-    static bool updatePassword(int userId, const std::string& new_password_hash);
+    static std::optional<UserRecord> find_by_username(const std::string& username);
+    static std::optional<UserRecord> find_by_id(int id);
+    static bool is_username_unique(const std::string& username);
+    static bool is_email_unique(const std::string& email);
+    static bool update_password(int user_id, const std::string& new_password_hash);
 };

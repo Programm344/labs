@@ -1,9 +1,9 @@
 #include "UserRepository.h"
-#include "Database.h"
+#include "database.h"
 #include <iostream>
 #include <cctype>
 
-static std::string toLower(const std::string& str) {
+static std::string to_lower(const std::string& str) {
     std::string result = str;
     for (char& c : result) {
         c = std::tolower(c);
@@ -29,7 +29,7 @@ bool UserRepository::create(const std::string& username,
     return rc == SQLITE_DONE;
 }
 
-std::optional<UserRecord> UserRepository::findByUsername(const std::string& username) {
+std::optional<UserRecord> UserRepository::find_by_username(const std::string& username) {
     const char* sql = "SELECT id, username, email, password_hash, birthday, created_at FROM users WHERE username = ?";
     
     sqlite3_stmt* stmt;
@@ -52,7 +52,7 @@ std::optional<UserRecord> UserRepository::findByUsername(const std::string& user
     return std::nullopt;
 }
 
-std::optional<UserRecord> UserRepository::findById(int id) {
+std::optional<UserRecord> UserRepository::find_by_id(int id) {
     const char* sql = "SELECT id, username, email, password_hash, birthday, created_at FROM users WHERE id = ?";
     
     sqlite3_stmt* stmt;
@@ -75,8 +75,8 @@ std::optional<UserRecord> UserRepository::findById(int id) {
     return std::nullopt;
 }
 
-bool UserRepository::isUsernameUnique(const std::string& username) {
-    std::string lower = toLower(username);
+bool UserRepository::is_username_unique(const std::string& username) {
+    std::string lower = to_lower(username);
     const char* sql = "SELECT COUNT(*) FROM users WHERE LOWER(username) = ?";
     
     sqlite3_stmt* stmt;
@@ -91,8 +91,8 @@ bool UserRepository::isUsernameUnique(const std::string& username) {
     return count == 0;
 }
 
-bool UserRepository::isEmailUnique(const std::string& email) {
-    std::string lower = toLower(email);
+bool UserRepository::is_email_unique(const std::string& email) {
+    std::string lower = to_lower(email);
     const char* sql = "SELECT COUNT(*) FROM users WHERE LOWER(email) = ?";
     
     sqlite3_stmt* stmt;
@@ -107,13 +107,13 @@ bool UserRepository::isEmailUnique(const std::string& email) {
     return count == 0;
 }
 
-bool UserRepository::updatePassword(int userId, const std::string& new_password_hash) {
+bool UserRepository::update_password(int user_id, const std::string& new_password_hash) {
     const char* sql = "UPDATE users SET password_hash = ? WHERE id = ?";
     
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(Database::get_instance().getDB(), sql, -1, &stmt, nullptr);
     sqlite3_bind_text(stmt, 1, new_password_hash.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 2, userId);
+    sqlite3_bind_int(stmt, 2, user_id);
     
     int rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
