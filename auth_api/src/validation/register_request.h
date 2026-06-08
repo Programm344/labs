@@ -18,7 +18,7 @@ private:
     std::vector<std::string> errors_;
     
     bool validate_username() {
-        std::regex pattern("^[A-Z][a-zA-Z]{6,}$");
+        std::regex pattern("^[A-Z][a-zA-Z0-9]{6,}$");;
         return std::regex_match(username_, pattern);
     }
     

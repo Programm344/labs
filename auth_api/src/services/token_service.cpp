@@ -1,5 +1,5 @@
-#include "TokenService.h"
-#include "../database/Database.h"
+#include "token_service.h"
+#include "../database/database.h"
 #include <jwt-cpp/jwt.h>     
 #include <chrono>              
 #include <iostream>            
@@ -69,7 +69,6 @@ void TokenService::store_token_hash(const std::string& token_hash, int user_id,
 }
 
 bool TokenService::is_token_revoked(const std::string& token_hash) {
-    
     const char* sql = "SELECT COUNT(*) FROM revoked_tokens WHERE token_hash = ?";
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(Database::get_instance().getDB(), sql, -1, &stmt, nullptr);
@@ -80,7 +79,10 @@ bool TokenService::is_token_revoked(const std::string& token_hash) {
         count = sqlite3_column_int(stmt, 0);
     }
     sqlite3_finalize(stmt);
-    return count > 0;  
+    
+    std::cout << "[DEBUG] is_token_revoked: token_hash=" << token_hash << ", count=" << count << std::endl;
+    
+    return count > 0;
 }
 
 void TokenService::mark_token_as_revoked(const std::string& token_hash, int user_id) {
@@ -106,15 +108,21 @@ TokenService::TokenPair TokenService::generate_tokens(int user_id) {
 
      auto access_token = jwt::create()
         .set_issuer("auth_api")
-        .set_type("access")
+        .set_payload_claim("type", jwt::claim(std::string("access"))) 
         .set_subject(std::to_string(user_id))
         .set_issued_at(now)
         .set_expires_at(now + std::chrono::minutes(access_token_ttl_))
         .sign(jwt::algorithm::hs256{secret_key_});
 
+std::cout << "[DEBUG] Generated access_token: " << access_token << std::endl;
+// Проверь, что в токене есть "iss" и "type"
+auto decoded = jwt::decode(access_token);
+std::cout << "[DEBUG] Payload: " << decoded.get_payload() << std::endl;
+
+
          auto refresh_token = jwt::create()
         .set_issuer("auth_api")
-        .set_type("refresh")
+        .set_payload_claim("type", jwt::claim(std::string("refresh")))
         .set_subject(std::to_string(user_id))
         .set_issued_at(now)
         .set_expires_at(now + std::chrono::minutes(refresh_token_ttl_))
@@ -131,8 +139,13 @@ TokenService::TokenPair TokenService::generate_tokens(int user_id) {
 bool TokenService::validate_access_token(const std::string& token) {
     try {
         // расшифровываем JWT
+
+       
         auto decoded = jwt::decode(token);
         
+
+
+
         // настраиваем проверку
         auto verifier = jwt::verify()
             .allow_algorithm(jwt::algorithm::hs256{secret_key_})
@@ -175,14 +188,19 @@ int TokenService::get_user_id_from_token(const std::string& token) {
 }
 
 void TokenService::revoke_token(const std::string& token) {
+    std::cout << "[DEBUG] revoke_token called" << std::endl;
     int user_id = get_user_id_from_token(token);
+    std::cout << "[DEBUG] user_id: " << user_id << std::endl;
     if (user_id != -1) {
-        mark_token_as_revoked(hash_token(token), user_id);
+        std::string token_hash = hash_token(token);
+        std::cout << "[DEBUG] token_hash: " << token_hash << std::endl;
+        mark_token_as_revoked(token_hash, user_id);
+        std::cout << "[DEBUG] Token revoked" << std::endl;
     }
 }
 
 void TokenService::revoke_all_user_tokens(int user_id) {
-    /
+    
     const char* sql = "SELECT token_hash FROM active_tokens WHERE user_id = ?";
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(Database::get_instance().getDB(), sql, -1, &stmt, nullptr);

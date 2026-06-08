@@ -15,7 +15,7 @@ private:
     
     bool validate_username() {
         // Только латинские буквы, начинается с заглавной, мин 7 символов
-        std::regex pattern("^[A-Z][a-zA-Z]{6,}$");
+       std::regex pattern("^[A-Z][a-zA-Z0-9]{6,}$");
         return std::regex_match(username_, pattern);
     }
     
@@ -42,11 +42,13 @@ public:
         errors_.clear();
         if (!validate_username()) {
             errors_.push_back("Username must start with uppercase letter and be at least 7 chars");
+            return false;
         }
         if (!validate_password()) {
             errors_.push_back("Password must be at least 8 chars with digit, special char, uppercase and lowercase");
+            return false;
         }
-        return errors_.empty();
+        return true;
     }
     
     const std::vector<std::string>& get_errors() const { return errors_; }

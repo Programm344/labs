@@ -39,4 +39,7 @@ struct context
         ctx.user_id = token_service_->get_user_id_from_token(token);
         req.add_header("X-User-Id", std::to_string(ctx.user_id));
          }
+         void after_handle(crow::request& req, crow::response& res, context& ctx) {
+     
+       }
     };

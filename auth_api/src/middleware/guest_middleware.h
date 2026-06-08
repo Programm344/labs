@@ -18,7 +18,7 @@ void before_handle(crow::request& req, crow::response& res, context& ctx) {
     if (auth_header.empty()) {
     return;  // гость, всё ок
     }
-}
+
 if (auth_header.substr(0, 7) == "Bearer ") {
     std::string token = auth_header.substr(7);
     if (token_service_->validate_access_token(token)) {
@@ -28,4 +28,8 @@ if (auth_header.substr(0, 7) == "Bearer ") {
         return;
     }
 }
+}
+ void after_handle(crow::request& req, crow::response& res, context& ctx) {
+     
+    }
 };
