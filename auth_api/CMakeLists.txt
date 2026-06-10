@@ -25,7 +25,7 @@ FetchContent_Declare(
 )
 
 # ----------------------------------------------------------------------
-# JWT библиотека (правильный репозиторий)
+# JWT библиотека
 # ----------------------------------------------------------------------
 FetchContent_Declare(
     jwt-cpp
@@ -64,15 +64,15 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_executable(auth_api ${SOURCES})
 
 # ----------------------------------------------------------------------
-# Подключаем заголовочные файлы (ВАЖНО: добавляем все пути)
+# Подключаем заголовочные файлы
 # ----------------------------------------------------------------------
 target_include_directories(auth_api PRIVATE
     ${SQLite3_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
     src
     ${nlohmann_json_SOURCE_DIR}/include
-    ${jwt-cpp_SOURCE_DIR}/include      # ← путь к jwt-cpp
-    ${bcrypt_SOURCE_DIR}/include        # ← путь к bcrypt
+    ${jwt-cpp_SOURCE_DIR}/include
+    ${bcrypt_SOURCE_DIR}/include
 )
 
 # ----------------------------------------------------------------------
@@ -80,7 +80,8 @@ target_include_directories(auth_api PRIVATE
 # ----------------------------------------------------------------------
 target_link_libraries(auth_api
     ${SQLite3_LIBRARIES}
-    ${OPENSSL_LIBRARIES}
+    OpenSSL::SSL
+    OpenSSL::Crypto
     bcrypt
 )
 
